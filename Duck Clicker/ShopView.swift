@@ -3,15 +3,14 @@ import CoreData
 
 struct ShopView: View {
     @Binding var clicks: Int
-    @FetchRequest(sortDescriptors: []) var shopItems: FetchedResults<ShopItem>
+    @State var shopItems = [ShopItem]()
     @EnvironmentObject var shopViewModel: ShopViewModel
     
     var body: some View {
-        List(shopItems, id: \.id) { item in
+        List(shopItems) { item in
             Button {
                 item.quantity += 1
                 clicks -= Int(item.price)
-                shopViewModel.save()
             } label: {
                 HStack {
                     VStack(alignment: .leading) {

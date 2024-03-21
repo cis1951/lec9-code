@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct GameView: View {
-    @AppStorage("clicks") var clicks = 0
+    @State var clicks = 0
     
-    @FetchRequest(sortDescriptors: []) var shopItems: FetchedResults<ShopItem>
+    @State var shopItems = [ShopItem]()
     @State var isSettingPassword = false
     @State var pendingPassword = ""
     @EnvironmentObject var passwordViewModel: PasswordViewModel
