@@ -1,5 +1,7 @@
 # Duck Clicker
 
+**Package URL, for quick reference:** https://github.com/evgenyneu/keychain-swift.git
+
 This repo contains the code for **Lecture 9: Data Persistence**.
 
 We'll be building a clicker game, complete with a shop and password protection. Along the way, we'll use a few different data persistence techniques to make sure that game state is saved between launches:
