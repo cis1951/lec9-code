@@ -17,7 +17,7 @@ The number of clicks is stored in `GameView.swift`. To save this using `UserDefa
 
 ```swift
 struct GameView: View {
-    @AppStoraage("clicks") var clicks = 0
+    @AppStorage("clicks") var clicks = 0
 
     // ...
 }
