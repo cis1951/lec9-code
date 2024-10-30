@@ -120,7 +120,7 @@ It's time to integrate our work with Core Data into the rest of the app. We'll s
 
 ```swift
 ContentView()
-    .environment(\.managedObjectContext, viewModel.persistentContainer.viewContext)
+    .environment(\.managedObjectContext, ShopViewModel.shared.persistentContainer.viewContext)
     .environmentObject(ShopViewModel.shared)
     .environmentObject(PasswordViewModel.shared)
 ```
