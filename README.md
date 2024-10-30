@@ -1,5 +1,7 @@
 # Duck Clicker
 
+**Package URL, for quick reference:** https://github.com/evgenyneu/keychain-swift.git
+
 This repo contains the code for **Lecture 9: Data Persistence**.
 
 We'll be building a clicker game, complete with a shop and password protection. Along the way, we'll use a few different data persistence techniques to make sure that game state is saved between launches:
@@ -15,7 +17,7 @@ The number of clicks is stored in `GameView.swift`. To save this using `UserDefa
 
 ```swift
 struct GameView: View {
-    @AppStoraage("clicks") var clicks = 0
+    @AppStorage("clicks") var clicks = 0
 
     // ...
 }
@@ -118,7 +120,7 @@ It's time to integrate our work with Core Data into the rest of the app. We'll s
 
 ```swift
 ContentView()
-    .environment(\.managedObjectContext, viewModel.persistentContainer.viewContext)
+    .environment(\.managedObjectContext, ShopViewModel.shared.persistentContainer.viewContext)
     .environmentObject(ShopViewModel.shared)
     .environmentObject(PasswordViewModel.shared)
 ```
