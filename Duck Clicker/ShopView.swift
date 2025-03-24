@@ -1,25 +1,24 @@
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct ShopView: View {
     @Binding var clicks: Int
     @State var shopItems = [ShopItem]()
-    @EnvironmentObject var shopViewModel: ShopViewModel
     
     var body: some View {
         List(shopItems) { item in
             Button {
-                item.quantity += 1
-                clicks -= Int(item.price)
+                item.amountPurchased += 1
+                clicks -= item.price
             } label: {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text(item.name ?? "Unknown Item")
+                        Text(item.name)
                         Text("Price: ^[\(item.price) clicks](inflect: true)")
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("x\(item.quantity)")
+                    Text("x\(item.amountPurchased)")
                 }
             }
             .disabled(clicks < item.price)
@@ -31,5 +30,4 @@ struct ShopView: View {
 
 #Preview {
     ShopView(clicks: .constant(0))
-        .environmentObject(ShopViewModel.shared)
 }

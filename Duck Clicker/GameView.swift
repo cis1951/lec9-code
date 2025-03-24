@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct GameView: View {
     @State var clicks = 0
@@ -6,12 +7,11 @@ struct GameView: View {
     @State var shopItems = [ShopItem]()
     @State var isSettingPassword = false
     @State var pendingPassword = ""
-    @EnvironmentObject var passwordViewModel: PasswordViewModel
     
     var clicksPerSecond: Int {
         var clicks = 0
         for item in shopItems {
-            clicks += Int(item.clicksPerSecond * item.quantity)
+            clicks += item.clicksPerSecond * item.amountPurchased
         }
         return clicks
     }
@@ -64,7 +64,7 @@ struct GameView: View {
                     isSettingPassword = false
                 }
                 Button("Set") {
-                    passwordViewModel.setPassword(password: pendingPassword)
+                    PasswordViewModel.shared.setPassword(password: pendingPassword)
                     isSettingPassword = false
                 }
             }
@@ -74,6 +74,4 @@ struct GameView: View {
 
 #Preview {
     GameView()
-        .environmentObject(ShopViewModel.shared)
-        .environmentObject(PasswordViewModel.shared)
 }

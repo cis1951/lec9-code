@@ -1,9 +1,12 @@
 import SwiftUI
 
-class PasswordViewModel: ObservableObject {
+@Observable class PasswordViewModel {
     static let shared = PasswordViewModel()
-    @Published private(set) var isAuthenticated: Bool
-
+    
+    private static let passwordKey = "password"
+    
+    private(set) var isAuthenticated: Bool
+    
     private init() {
         self.isAuthenticated = true
     }
@@ -13,6 +16,6 @@ class PasswordViewModel: ObservableObject {
     }
     
     func setPassword(password: String) {
-        
+        fatalError("Unimplemented")
     }
 }
