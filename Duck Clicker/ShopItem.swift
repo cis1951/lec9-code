@@ -33,6 +33,7 @@ extension ModelContext {
     }
     
     func createInitialShopItems() throws {
-        
+        try createShopItem(name: "Cursor", price: 1, clicksPerSecond: 1)
+        try createShopItem(name: "Test Item", price: 2, clicksPerSecond: 100)
     }
 }
