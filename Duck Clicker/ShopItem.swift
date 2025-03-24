@@ -20,3 +20,14 @@ class ShopItem {
 }
 
 extension ShopItem: Identifiable {}
+
+extension ModelContext {
+    func createShopItem(name: String, price: Int, clicksPerSecond: Int) throws {
+        fatalError("Unimplemented")
+    }
+    
+    func createInitialShopItems() throws {
+        try createShopItem(name: "Cursor", price: 1, clicksPerSecond: 1)
+        try createShopItem(name: "Test Item", price: 2, clicksPerSecond: 100)
+    }
+}
