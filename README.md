@@ -6,7 +6,7 @@ This repo contains the code for **Lecture 9: Data Persistence**.
 
 We'll be building a clicker game, complete with a shop and password protection. Along the way, we'll use a few different data persistence techniques to make sure that game state is saved between launches:
 * `UserDefaults` for the number of clicks
-* Core Data for purchased shop items
+* SwiftData for purchased shop items
 * Keychain for the password
 
 We've implemented most of the game for you, but it's up to you to polish it up with data persistence. Here's a walkthrough of the steps you'll take to do so:
@@ -28,142 +28,77 @@ And that's it! To test it out, run your game, click the duck a few times, then c
 > [!NOTE]
 > It's not enough to just hit the home button - the system will often keep the app running (or suspended) in the background. You need to either hit **Stop** in Xcode or [force quit](https://support.apple.com/guide/iphone/quit-and-reopen-an-app-iph83bfec492/ios) the app to test out most forms of data persistence.
 
-## Step 2: Set up the Core Data model
+## Step 2: Set up the SwiftData model
 
-Now, let's set up Core Data to store the shop items. We'll start by telling Core Data what it should store with a *model file*. Go ahead and create one:
-1. Go to **File > New > File...**, or create a new file by right clicking on the left sidebar
-2. Scroll down to the **Core Data** section, then choose **Data Model**.
-3. Name the file `Model`, then click **Create**.
+Now, let's turn our attention to the shop. We'll start by telling SwiftData what it should store with a *model*.
 
-Let's now create an entity to represent our shop items. Open up the data model, then click **Add Entity** and name it `ShopItem`. Select the new `ShopItem` entity, then under the Attributes section, add these four properties:
-* `name` - String
-* `price` - Integer 64
-* `quantity` - Integer 64
-* `clicksPerSecond` - Integer 64
-
-Next, click on each of the 3 integer attributes. On the right panel, uncheck the **Optional** checkbox. This will make sure we don't have to deal with any of these attributes being `nil`.
-
-If you try to compile the project now, you'll get an error because `ShopItem` is duplicated. That's because Core Data generates a `ShopItem` class for us, complete with properties and a conformance to `Identifiable`. This means that we don't need the `ShopItemStub` file anymore - **go ahead and delete it** before moving on.
-
-## Step 3: Set up the Core Data stack
-
-Now, we'll set up a Core Data stack -- that is, a central object we'll use to communicate with Core Data. Since we're using Core Data to store our shop items, we'll put this logic in the `ShopViewModel`. We'll start by adding a `persistentContainer` property to our view model:
+When we create a model, we need to tell SwiftData what properties it should store, along with their types and any special constraints, much like a `CREATE TABLE` command in SQL. Luckily, SwiftData makes this easy for us by letting us define our model with a simple class. We've already done most of the work for you, so all you need to do is go to `ShopItem` and use the `@Model` macro, like this:
 
 ```swift
-lazy var persistentContainer: NSPersistentContainer = {
-    let container = NSPersistentContainer(name: "Model")
-    container.loadPersistentStores { _, error in
-        if let error {
-            // This is probably not a good idea for an actual production app
-            fatalError("Oh no! \(error.localizedDescription)")
-        }
-    }
-    
-    return container
-}()
+@Model
+class ShopItem
 ```
 
-We'll also need a method we can call to save any changes we've made. Add this method to the `ShopViewModel`:
+You might notice that the `id` property is commented with a TODO saying to remove it. That's because SwiftData automatically sets a [persistent identifier](https://developer.apple.com/documentation/swiftdata/persistentmodel/persistentmodelid) for each instance we create, giving us `Identifiable` conformance for free! So, go ahead and remove the `id` property (as well as the `extension` that conforms `ShopItem` to `Identifiable`, if you'd like.)
+
+## Step 3: Set up the model container
+
+Now, we'll set up a model container -- that is, a central object that coordinates storing and retrieving persistent objects. To do this, add a `.modelContainer` modifier in `DuckClickerApp`'s body, as well as each of the `#Preview` blocks:
 
 ```swift
-func save() {
-    // Only save if there are changes
-    guard persistentContainer.viewContext.hasChanges else {
-        return
-    }
-    
-    do {
-        try persistentContainer.viewContext.save()
-    } catch {
-        print("Oh no, couldn't save! \(error)")
-    }
-}
+ContentView()
+    .modelContainer(for: [ShopItem.self])
 ```
 
-One final thing: let's add a few initial items to our shop when the app first launches. To do that, we'll first set up a `createShopItem` method, which will create a single shop item if it doesn't already exist:
+One more thing: let's add a few initial items to our shop when the app first launches. We'll trigger this process as soon as the model container loads when we launch our app. In `DuckClickerApp`, pass in a handler function to the `.modelContainer` modifier -- it'll get called when the container is ready:
+
+```swift
+ContentView()
+    .modelContainer(for: [ShopItem.self]) { result in
+        let container = try! result.get()
+        try! container.mainContext.createInitialShopItems()
+    }
+```
+
+This is all well and good, but we also need to actually implement the logic to create each shop item. We've laid out the structure for you in `ShopItem.swift`, under the `ModelContext` extension. Go ahead and fill `createShopItem` in:
 
 ```swift
 func createShopItem(name: String, price: Int, clicksPerSecond: Int) throws {
-    let request = ShopItem.fetchRequest()
-    request.predicate = NSPredicate(format: "name == %@", name)
+    // See if there's already an item with the name
+    let descriptor = FetchDescriptor<ShopItem>(
+        predicate: #Predicate { $0.name == name }
+    )
     
-    let results = try persistentContainer.viewContext.fetch(request)
-    guard results.isEmpty else { return }
+    let existingItems = try fetch(descriptor)
+
+    // If there is, we exit early
+    guard existingItems.isEmpty else {
+        return
+    }
     
-    let item = ShopItem(context: persistentContainer.viewContext)
-    item.name = name
-    item.price = Int64(price)
-    item.clicksPerSecond = Int64(clicksPerSecond)
+    // Otherwise, we create the item and let the context know about it (which saves it)
+    let item = ShopItem(name: name, price: price, clicksPerSecond: clicksPerSecond)
+    insert(item)
 }
 ```
 
-Now, we'll make another method called `createInitialShopItems`, which will use the method we just made to create our initial items:
+At this point, you've set up all the plumbing for the shop. Take some time to look at the items we've put in there for you to start with -- if you'd like to add more, go for it!
 
+## Step 4: Integrate SwiftData with the shop UI
+
+It's time to integrate our work with SwiftData into the rest of the app. We've already started doing this with that `.modelContainer` modifier, but we now need to get the shop UI and the game logic to talk to SwiftData.
+
+We'll start with the `GameView`, which already has an `@State` property that maintains a list of shop items. All we need to do is switch this to `@Query` so that it now reads from SwiftData:
 ```swift
-func createInitialShopItems() {
-    do {
-        try createShopItem(name: "Finger", price: 10, clicksPerSecond: 1)
-        try createShopItem(name: "I am rich", price: 1000000000, clicksPerSecond: 100000000)
-        
-        save()
-    } catch {
-        print("Couldn't create shop items: \(error)")
-    }
-}
+@Query var shopItems: [SopItem]
 ```
 
-We've put a few items in there for you to start with, but feel free to add as many as you want!
-
-## Step 4: Integrate Core Data with the shop
-
-It's time to integrate our work with Core Data into the rest of the app. We'll start at the very root of the app -- `DuckClickerApp`. First, we'll tell SwiftUI about our Core Data database by passing it a `managedObjectContext`:
-
+We'll do the same thing in `ShopView`, but this time, we can tell it to sort by price:
 ```swift
-ContentView()
-    .environment(\.managedObjectContext, ShopViewModel.shared.persistentContainer.viewContext)
-    .environmentObject(ShopViewModel.shared)
-    .environmentObject(PasswordViewModel.shared)
+@Query(sort: \ShopItem.price) var shopItems: [ShopItem]
 ```
 
-Next, we'll make sure that our shop items are created when the app launches. We can do this with `.onAppear`:
-
-```swift
-ContentView()
-    .environment(\.managedObjectContext, ShopViewModel.shared.persistentContainer.viewContext)
-    .environmentObject(ShopViewModel.shared)
-    .environmentObject(PasswordViewModel.shared)
-    .onAppear {
-        ShopViewModel.shared.createInitialShopItems()
-    }
-```
-
-Lastly, we'll tell *both* `ShopView` and `GameView` to fetch and store shop items from our Core Data database, rather than using the stubs we had before. Both views contain a property that looks like this:
-
-```swift
-@State var shopItems: [ShopItem] = []
-```
-
-Go ahead and replace it with this:
-
-```swift
-@FetchRequest(sortDescriptors: []) var shopItems: FetchedResults<ShopItem>
-```
-
-Note that everything else in the views stays the same -- that's because Core Data is doing all the heavy lifting for us! There is, however, one final thing we have to do. In `ShopView`, we need to make it so that when you buy an item, we tell Core Data to save its changes:
-
-```swift
-Button {
-    item.quantity += 1
-    clicks -= Int(item.price)
-    shopViewModel.save()
-} label: {
-    // ...
-}
-.disabled(clicks < item.price)
-.tint(.primary)
-```
-
-Go ahead and test it out - the shop should now be working!
+Note that everything else in the views stays the same -- that's because SwiftData is doing all the heavy lifting for us. Go ahead and test it out - the shop should now be working!
 
 ## Step 5: Install KeychainSwift
 
@@ -193,7 +128,7 @@ private init() {
     let keychain = KeychainSwift()
     
     self.keychain = keychain
-    self.isAuthenticated = keychain.get("password") == nil
+    self.isAuthenticated = keychain.get(Self.passwordKey) == nil
 }
 ```
 
@@ -201,7 +136,7 @@ Next, let's implement the `checkPassword` method, which will check the argument 
 
 ```swift
 func checkPassword(password: String) -> Bool {
-    if password == keychain.get("password") {
+    if password == keychain.get(Self.passwordKey) {
         isAuthenticated = true
         return true
     }
