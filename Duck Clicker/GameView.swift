@@ -1,9 +1,10 @@
 import SwiftUI
+import SwiftData
 
 struct GameView: View {
     @AppStorage("clicks") var clicks = 0
     
-    @FetchRequest(sortDescriptors: []) var shopItems: FetchedResults<ShopItem>
+    @Query var shopItems: [ShopItem]
     @State var isSettingPassword = false
     @State var pendingPassword = ""
     @EnvironmentObject var passwordViewModel: PasswordViewModel
@@ -11,7 +12,7 @@ struct GameView: View {
     var clicksPerSecond: Int {
         var clicks = 0
         for item in shopItems {
-            clicks += Int(item.clicksPerSecond * item.quantity)
+            clicks += item.clicksPerSecond * item.amountPurchased
         }
         return clicks
     }
@@ -74,6 +75,6 @@ struct GameView: View {
 
 #Preview {
     GameView()
-        .environmentObject(ShopViewModel.shared)
         .environmentObject(PasswordViewModel.shared)
+        .modelContainer(for: [ShopItem.self])
 }

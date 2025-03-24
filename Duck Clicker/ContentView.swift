@@ -32,6 +32,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(ShopViewModel.shared)
         .environmentObject(PasswordViewModel.shared)
 }
