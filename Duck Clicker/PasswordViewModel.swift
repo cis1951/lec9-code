@@ -1,18 +1,22 @@
 import SwiftUI
 import KeychainSwift
 
-class PasswordViewModel: ObservableObject {
+@Observable class PasswordViewModel {
     static let shared = PasswordViewModel()
-    @Published private(set) var isAuthenticated: Bool
+    
+    private static let passwordKey = "password"
+    
+    private(set) var isAuthenticated: Bool
     
     private let keychain: KeychainSwift
     private var password: String?
     
     private init() {
         let keychain = KeychainSwift()
+        let password = keychain.get(Self.passwordKey)
         
         self.keychain = keychain
-        self.password = keychain.get("password")
+        self.password = password
         self.isAuthenticated = password == nil
     }
     
@@ -27,8 +31,6 @@ class PasswordViewModel: ObservableObject {
     
     func setPassword(password: String) {
         self.password = password
-        if !keychain.set(password, forKey: "password") {
-            print("\(password) NOT WRITTEN TO KEYCHAIN")
-        }
+        precondition(keychain.set(password, forKey: Self.passwordKey), "Failed to write password to keychain")
     }
 }

@@ -1,13 +1,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var passwordViewModel: PasswordViewModel
-    
     @State var pendingPassword = ""
     @State var isWrongPassword = false
     
     var body: some View {
-        if passwordViewModel.isAuthenticated {
+        if PasswordViewModel.shared.isAuthenticated {
             GameView()
         } else {
             VStack {
@@ -19,7 +17,7 @@ struct ContentView: View {
                 SecureField("Password", text: $pendingPassword)
                     .textFieldStyle(.roundedBorder)
                 Button("Authenticate") {
-                    if !passwordViewModel.checkPassword(password: pendingPassword) {
+                    if !PasswordViewModel.shared.checkPassword(password: pendingPassword) {
                         isWrongPassword = true
                     }
                 }
@@ -32,5 +30,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .environmentObject(PasswordViewModel.shared)
 }

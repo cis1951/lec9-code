@@ -7,7 +7,6 @@ struct GameView: View {
     @Query var shopItems: [ShopItem]
     @State var isSettingPassword = false
     @State var pendingPassword = ""
-    @EnvironmentObject var passwordViewModel: PasswordViewModel
     
     var clicksPerSecond: Int {
         var clicks = 0
@@ -65,7 +64,7 @@ struct GameView: View {
                     isSettingPassword = false
                 }
                 Button("Set") {
-                    passwordViewModel.setPassword(password: pendingPassword)
+                    PasswordViewModel.shared.setPassword(password: pendingPassword)
                     isSettingPassword = false
                 }
             }
@@ -75,6 +74,5 @@ struct GameView: View {
 
 #Preview {
     GameView()
-        .environmentObject(PasswordViewModel.shared)
         .modelContainer(for: [ShopItem.self])
 }
