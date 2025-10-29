@@ -27,6 +27,7 @@
 		893D6D122BACE3A20077E35F /* ShopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopView.swift; sourceTree = "<group>"; };
 		893D6D192BACF22D0077E35F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		893D6D1B2BACF41D0077E35F /* PasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordViewModel.swift; sourceTree = "<group>"; };
+		895338E62EB2B05D00DBE0EB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		895FE03F2D91D56F0037045C /* ShopItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShopItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,6 +46,7 @@
 		893D6CF62BACE2020077E35F = {
 			isa = PBXGroup;
 			children = (
+				895338E62EB2B05D00DBE0EB /* README.md */,
 				893D6D012BACE2020077E35F /* Duck Clicker */,
 				893D6D002BACE2020077E35F /* Products */,
 			);
@@ -296,7 +298,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Duck Clicker/Preview Content\"";
-				DEVELOPMENT_TEAM = 9G475R3MEF;
+				DEVELOPMENT_TEAM = VU59R57FGM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -326,7 +328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Duck Clicker/Preview Content\"";
-				DEVELOPMENT_TEAM = 9G475R3MEF;
+				DEVELOPMENT_TEAM = VU59R57FGM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
